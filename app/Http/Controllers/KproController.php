@@ -236,7 +236,9 @@ class KproController extends Controller
 
         $response = curl_exec($curl);
         curl_close($curl);
-        $dom = @\DOMDocument::loadHTML(trim($response));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
         $columns = array(
@@ -386,7 +388,9 @@ class KproController extends Controller
 
         curl_close($curl);
 
-        $dom = @\DOMDocument::loadHTML(trim($response));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
         $columns = array(
@@ -542,7 +546,9 @@ class KproController extends Controller
         $response = curl_exec($curl);
 
         curl_close($curl);
-        $dom = @\DOMDocument::loadHTML(trim($response));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
         $columns = array(
@@ -673,7 +679,9 @@ class KproController extends Controller
         $response = curl_exec($curl);
 
         curl_close($curl);
-        $dom = @\DOMDocument::loadHTML(trim($response));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
         $columns = array(1 => 'order_id','regional','witel','datel','sto','unit','jenis_psb','type_trans','type_layanan','status_resume','status_message','provider','order_date','last_update_date','device_id','hide','package_name','loc_id','ncli','speedy','customer_name','contact_hp','ins_address','gps_longitude','gps_latitude','kcontact','umur','tindak_lanjut','isi_comment','tgl_comment','user_id_tl','wonum','desc_task','status_task','schedule_labor','act_start','amcrew','status_redaman','status_voice','status_inet','status_onu','olt_rx','onu_rx','snr_up','snr_down','upload','download','last_program','clid','last_start','last_view','ukur_time','teknisi','channel','group_channel','customer_addr_new');
@@ -796,7 +804,9 @@ class KproController extends Controller
         $response = curl_exec($curl);
         curl_close($curl);
 
-        $dom = @\DOMDocument::loadHTML(trim($response));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
         $columns = array(
@@ -975,7 +985,9 @@ class KproController extends Controller
         $response = curl_exec($curl);
 
         curl_close($curl);
-        $dom = @\DOMDocument::loadHTML(trim($response));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
         $columns = array(
@@ -1045,7 +1057,9 @@ class KproController extends Controller
 
         if (isset($response))
         {
-            $dom = @\DOMDocument::loadHTML(trim($response));
+            libxml_use_internal_errors(true);
+            $dom = new \DOMDocument();
+            $dom->loadHTML(trim($response));
             $table = $dom->getElementsByTagName('table')->item(0);
             $rows = $table->getElementsByTagName('tr');
             $columns = array(
@@ -1137,7 +1151,9 @@ class KproController extends Controller
         $response = curl_exec($curl);
         curl_close($curl);
 
-        $dom = @\DOMDocument::loadHTML(trim($response));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
         $columns = array(
