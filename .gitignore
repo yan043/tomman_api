@@ -1,7 +1,7 @@
-# /storage
-# /storage/*
-# storage
-# storage/*
+/storage
+/storage/*
+storage
+storage/*
 
 /vendor
 /vendor/*
@@ -13,8 +13,8 @@ vendor/*
 node_modules
 node_modules/*
 
-# .env
-# *.env
+.env
+*.env
 
 composer.lock
 .vscode/sftp.json
