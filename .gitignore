@@ -1,0 +1,23 @@
+# /storage
+# /storage/*
+# storage
+# storage/*
+
+/vendor
+/vendor/*
+vendor
+vendor/*
+
+/node_modules
+/node_modules/*
+node_modules
+node_modules/*
+
+# .env
+# *.env
+
+composer.lock
+.vscode/sftp.json
+
+package.json
+package-lock.json
