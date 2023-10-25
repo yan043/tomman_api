@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
-use App\Models\Telegram;
 use DB;
 
 date_default_timezone_set('Asia/Makassar');
@@ -35,8 +32,11 @@ class NossaController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $login = curl_exec($ch);
 
-        $dom = @\DOMDocument::loadHTML(trim($login));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($login));
         $input = $dom->getElementsByTagName('input')->item(3)->getAttribute("value");
+
         curl_setopt($ch, CURLOPT_URL, 'https://nossa.telkom.co.id/maximo/ui/login');
         curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36');
         curl_setopt($ch, CURLOPT_POST, true);
@@ -49,7 +49,10 @@ class NossaController extends Controller
         curl_setopt($ch, CURLOPT_POST, false);
         $result = curl_exec($ch);
         curl_close ($ch);
-        $dom = @\DOMDocument::loadHTML(trim($result));
+
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($result));
         $get_input = $dom->getElementsByTagName('input');
         $get_filterrows = substr($result,strpos($result,'filterrows'),50);
         $get_params = substr($get_filterrows,0,strpos($get_filterrows,')'));
@@ -148,7 +151,9 @@ class NossaController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $login = curl_exec($ch);
 
-        $dom = @\DOMDocument::loadHTML(trim($login));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($login));
         $input = $dom->getElementsByTagName('input')->item(3)->getAttribute("value");
         // print_r($input);
         curl_setopt($ch, CURLOPT_URL, 'https://nossa.telkom.co.id/maximo/ui/login');
@@ -162,7 +167,10 @@ class NossaController extends Controller
         curl_setopt($ch, CURLOPT_URL, 'https://nossa.telkom.co.id/maximo/ui/?event=loadapp&value=incident');
         curl_setopt($ch, CURLOPT_POST, false);
         $result = curl_exec($ch);
-        $dom = @\DOMDocument::loadHTML(trim($result));
+
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($result));
 
         $get_input = $dom->getElementsByTagName('input');
         $get_filterrows = substr($result,strpos($result,'filterrows'),50);
@@ -283,7 +291,9 @@ class NossaController extends Controller
 
         $columns = ['incident','customer_name','contact_name','contact_email','contact_phone','summary','owner_group','owner','last_updated_work_log','last_work_log_date','count_custinfo','last_custinfo','assigned_to','booking_date','assigned_by','reported_priority','source','subsidiary','external_ticket_id','external_ticket_status','segment','channel','customer_segment','customer_type','closed_by','customer_id','service_id','service_no','service_type','top_priority','slg','technology','datek_induk_gamas','datek','rk_name','ibooster_alert_id','induk_gamas','related_to_global_issue','reported_date','lapul','gaul','ttr_customer','ttr_nasional','ttr_regional','ttr_witel','ttr_mitra','ttr_agent','ttr_pending','pending_reason','status','hasil_ukur','osm_resolved_code','last_update_ticket','status_date','resolved_by','workzone','witel','regional','incidents_symptom','solutions_segment','actual_solution','incident_domain','onu_rx_before_after','scc_fisik_inet','scc_logic','complete_wo_by','kode_produk','notes_eskalasi','resolved_date','jumlah_site_tsel_nossa','kategori_tiket_tsel','impacted_site_tsel','id_incident'];
 
-        $dom = @\DOMDocument::loadHTML(trim($result));
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($result));
 
         if ($result == "")
         {
