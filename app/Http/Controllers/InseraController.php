@@ -327,6 +327,8 @@ class InseraController extends Controller
             'ttr_region',
             'ttr_witel',
             'ttr_end_to_end',
+            'notes_eskalasi',
+            'guarante_status'
         );
         $result = array();
         for ($i = 1, $count = $rows->length; $i < $count; $i++) {
