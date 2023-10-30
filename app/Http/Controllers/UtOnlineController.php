@@ -133,53 +133,72 @@ class UtOnlineController extends Controller
     {
         $utonline = DB::table('cookie_systems')->where('application', 'utonline')->first();
 
-        ini_set('memory_limit', '-1');
-        ini_set('max_execution_time', '-1');
-
         for ($i = 0; $i <= 31; $i++)
         {
             $date = date('Y-m-d', strtotime("-$i days"));
 
+            exec("php /srv/htdocs/tomman_api/artisan full_utonline_date $utonline->cookies $date > /dev/null &");
 
-            $curl = curl_init();
+            print_r("php /srv/htdocs/tomman_api/artisan full_utonline_date $utonline->cookies $date > /dev/null &\n");
+        }
+    }
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://utonline.telkom.co.id/ut-online/api/order/listOrder',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => array('data[type]' => 'inbox_search','data[sdate]' => $date,'data[edate]' => $date,'data[range]' => 'xd2','data[where][order_code]' => '','data[where][xs1]' => '','data[where][xs4]' => '','data[where][xs5]' => '','data[where][order_status_id]' => '','data[where][xs9]' => 'KALSEL (BANJARMASIN)','data[where][xs10]' => 'REGIONAL_6','page' => '1','size' => '100'),
-                CURLOPT_HTTPHEADER => array(
-                    'Cookie: '.$utonline->cookies
-                ),
-            ));
+    public static function full_utonline_date($cookie, $date)
+    {
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '-1');
 
-            $response = curl_exec($curl);
-            curl_close($curl);
+        $curl = curl_init();
 
-            $result = json_decode($response);
-            if ($result)
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://utonline.telkom.co.id/ut-online/api/order/listOrder',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => [
+                'data[type]'                   => 'inbox_search',
+                'data[sdate]'                  => $date,
+                'data[edate]'                  => $date,
+                'data[range]'                  => 'xd2',
+                'data[where][order_code]'      => '',
+                'data[where][xs1]'             => '',
+                'data[where][xs4]'             => '',
+                'data[where][xs5]'             => '',
+                'data[where][order_status_id]' => '',
+                'data[where][xs9]'             => 'KALSEL (BANJARMASIN)',
+                'data[where][xs10]'            => 'REGIONAL_6',
+                'data[isHistory]'              => true,
+                'page'                         => '1',
+                'size'                         => '100'
+            ],
+            CURLOPT_HTTPHEADER => [
+                'Cookie: '.$cookie
+            ],
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        $result = json_decode($response);
+        if ($result)
+        {
+            if ($result->total_rows)
             {
-                if ($result->total_rows)
+                DB::connection('db_t1')->table('utonline_tr6')->where('tglTrx_date', $date)->delete();
+
+                print_r("\ndate $date total pages $result->total_pages total rows $result->total_rows \n");
+
+                $pages = $result->total_pages;
+
+                for ($x = 1; $x <= $pages; $x++)
                 {
-                    DB::connection('db_t1')->table('utonline_tr6')->where('tglTrx_date', $date)->delete();
+                    exec("php /srv/htdocs/tomman_api/artisan full_utonline_pages $cookie $date $x > /dev/null &");
 
-                    print_r("date $date total pages $result->total_pages total rows $result->total_rows \n");
-
-                    $pages = $result->total_pages;
-
-                    for ($x = 1; $x <= $pages; $x++)
-                    {
-                        exec("php /srv/htdocs/tomman_api/artisan full_utonline_pages $utonline->cookies $date $x > /dev/null &");
-
-                        print_r("php /srv/htdocs/tomman_api/artisan full_utonline_pages $utonline->cookies $date $x > /dev/null &\n");
-
-                        sleep(5);
-                    }
+                    print_r("php /srv/htdocs/tomman_api/artisan full_utonline_pages $cookie $date $x > /dev/null &\n");
                 }
             }
         }
@@ -201,10 +220,25 @@ class UtOnlineController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => array('data[type]' => 'inbox_search','data[sdate]' => $date,'data[edate]' => $date,'data[range]' => 'xd2','data[where][order_code]' => '','data[where][xs1]' => '','data[where][xs4]' => '','data[where][xs5]' => '','data[where][order_status_id]' => '','data[where][xs9]' => 'KALSEL (BANJARMASIN)','data[where][xs10]' => 'REGIONAL_6','page' => $x,'size' => '100'),
-            CURLOPT_HTTPHEADER => array(
+            CURLOPT_POSTFIELDS => [
+                'data[type]'                   => 'inbox_search',
+                'data[sdate]'                  => $date,
+                'data[edate]'                  => $date,
+                'data[range]'                  => 'xd2',
+                'data[where][order_code]'      => '',
+                'data[where][xs1]'             => '',
+                'data[where][xs4]'             => '',
+                'data[where][xs5]'             => '',
+                'data[where][order_status_id]' => '',
+                'data[where][xs9]'             => 'KALSEL (BANJARMASIN)',
+                'data[where][xs10]'            => 'REGIONAL_6',
+                'data[isHistory]'              => true,
+                'page'                         => $x,
+                'size'                         => '100'
+            ],
+            CURLOPT_HTTPHEADER => [
                 'Cookie: '.$cookie
-            ),
+            ],
         ));
 
         $response = curl_exec($curl);
@@ -304,9 +338,10 @@ class UtOnlineController extends Controller
                 DB::connection('db_t1')->table('utonline_tr6')->insert($data);
             }
 
-            print_r("Finish Saved Pages $x Total $total\n");
+            print_r("finish saved pages $x total $total\n");
 
             DB::connection('db_t1')->statement('DELETE FROM `utonline_tr6` WHERE `order_code` LIKE "-%"');
+
             sleep(1);
         }
     }

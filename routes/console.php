@@ -86,6 +86,9 @@ Artisan::command('refresh_utonline', function () {
 Artisan::command('full_utonline', function () {
     UtOnlineController::full_utonline();
 });
+Artisan::command('full_utonline_date {cookie} {date}', function ($cookie, $date) {
+    UtOnlineController::full_utonline_date($cookie, $date);
+});
 Artisan::command('full_utonline_pages {cookie} {date} {x}', function ($cookie, $date, $x) {
     UtOnlineController::full_utonline_pages($cookie, $date, $x);
 });
