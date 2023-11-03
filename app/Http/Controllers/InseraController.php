@@ -329,7 +329,7 @@ class InseraController extends Controller
             'ttr_end_to_end',
             'notes_eskalasi',
             'guarante_status',
-            'resolve_date'
+            'resolved_date'
         );
         $result = array();
         for ($i = 1, $count = $rows->length; $i < $count; $i++) {
