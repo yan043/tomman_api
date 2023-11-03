@@ -47,6 +47,7 @@ class KproController extends Controller
         $header['headers'] = $header_content;
         $header['cookies'] = $cookiesOut;
         $cookiesOut = implode("; ", $matches['cookie']);
+
         if($cookiesOut)
         {
             DB::table('cookie_systems')->where('application', 'kpro')->update([
@@ -55,6 +56,7 @@ class KproController extends Controller
                 'cookies'  => $cookiesOut
             ]);
         }
+
         $kpro_cookies = DB::table('cookie_systems')->where('application', 'kpro')->first();
 
         libxml_use_internal_errors(true);

@@ -328,7 +328,8 @@ class InseraController extends Controller
             'ttr_witel',
             'ttr_end_to_end',
             'notes_eskalasi',
-            'guarante_status'
+            'guarante_status',
+            'resolve_date'
         );
         $result = array();
         for ($i = 1, $count = $rows->length; $i < $count; $i++) {
@@ -377,14 +378,14 @@ class InseraController extends Controller
                 $data['time_reported'] = date('H:i:s', strtotime($data['reported_date']));
             }
 
-            // if ($data['resolved_date'] == '')
-            // {
-            //     $data['resolved_date'] = '0000-00-00 00:00:00';
-            // }
-            // else
-            // {
-            //     $data['resolved_date'] = date('Y-m-d H:i:s', strtotime($data['resolved_date']));
-            // }
+            if ($data['resolved_date'] == '')
+            {
+                $data['resolved_date'] = '0000-00-00 00:00:00';
+            }
+            else
+            {
+                $data['resolved_date'] = date('Y-m-d H:i:s', strtotime($data['resolved_date']));
+            }
 
             $result[] = $data;
         }
