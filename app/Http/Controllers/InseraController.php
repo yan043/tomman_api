@@ -204,6 +204,8 @@ class InseraController extends Controller
             exec('php /srv/htdocs/tomman_api/artisan ticket_list_date '.$witel.' '.$date.' > /dev/null &');
 
             print_r("php /srv/htdocs/tomman_api/artisan ticket_list_date $witel $date > /dev/null &\n");
+
+            sleep(10);
         }
 
         exec('php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan '.$witel.' > /dev/null &');
@@ -413,7 +415,7 @@ class InseraController extends Controller
 
             print_r("reported date $date assurance order insera witel $witel total $total\n");
 
-            sleep(1);
+            sleep(5);
         }
     }
 }
