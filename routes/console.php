@@ -14,6 +14,7 @@ use App\Http\Controllers\InseraController;
 use App\Http\Controllers\UtOnlineController;
 use App\Http\Controllers\PrabacController;
 use App\Http\Controllers\RismaController;
+use App\Http\Controllers\XproController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,11 @@ Artisan::command('ukur_massal_inet {list_inet}', function ($list_inet) {
 });
 Artisan::command('monet_bpp', function () {
     IboosterController::monet_bpp();
+});
+
+// xpro
+Artisan::command('login_xpro {uname} {pass} {chatid}', function ($uname, $pass, $chatid) {
+    XproController::login_xpro($uname, $pass, $chatid);
 });
 
 // kpro
@@ -210,6 +216,9 @@ Artisan::command('refresh_insera', function () {
 });
 Artisan::command('ticket_list {witel}', function ($witel) {
     InseraController::ticket_list($witel);
+});
+Artisan::command('ticket_list_date {witel} {date}', function ($witel, $date) {
+    InseraController::ticket_list_date($witel, $date);
 });
 
 // risma
