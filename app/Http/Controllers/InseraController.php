@@ -197,9 +197,11 @@ class InseraController extends Controller
 
     public static function ticket_list($witel)
     {
-        for ($i = 0; $i <= 3; $i++)
+        for ($i = 0; $i <= 6; $i++)
         {
             $date = date('Y-m-d', strtotime("-$i days"));
+
+            // self::ticket_list_date($witel, $date);
 
             exec('php /srv/htdocs/tomman_api/artisan ticket_list_date '.$witel.' '.$date.' > /dev/null &');
 
@@ -207,6 +209,8 @@ class InseraController extends Controller
 
             sleep(10);
         }
+
+        // ApiController::cleansing_trash_order_kawan($witel);
 
         exec('php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan '.$witel.' > /dev/null &');
 
@@ -256,7 +260,7 @@ class InseraController extends Controller
         // print_r("$tokenValue\n\n");
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://oss-incident.telkom.co.id/jw/web/userview/ticketIncidentService/ticketIncidentService/_/allTicketList?d-5564009-ps='.$page_show.'&d-5564009-p='.$page.'&d-5564009-fn_reported_date_filter='.urlencode($start_datetime).'&d-5564009-fn_reported_date_filter='.urlencode($end_datetime).'&d-5564009-fn_C_CONTACT_NAME=&d-5564009-fn_status_date_filter=&d-5564009-fn_status_date_filter=&d-5564009-fn_C_CONTACT_PHONE=&d-5564009-fn_C_SUMMARY=&d-5564009-fn_C_CONTACT_EMAIL=&d-5564009-fn_C_OWNER_GROUP=&d-5564009-fn_C_OWNER=&d-5564009-fn_C_REPORTED_PRIORITY=&d-5564009-fn_C_SOURCE_TICKET=CUSTOMER,PROACTIVE,GAMAS&d-5564009-fn_C_SUBSIDIARY=&d-5564009-fn_C_EXTERNAL_TICKETID=&d-5564009-fn_C_CHANNEL=&d-5564009-fn_C_CUSTOMER_SEGMENT=DCS,PL-TSEL&d-5564009-fn_C_CUSTOMER_TYPE=&d-5564009-fn_C_CUSTOMER_ID=&d-5564009-fn_C_DESCRIPTION_CUSTOMERID=&d-5564009-fn_C_SERVICE_NO=&d-5564009-fn_C_SERVICE_TYPE=&d-5564009-fn_C_SERVICE_ID=&d-5564009-fn_C_SLG=&d-5564009-fn_C_TECHNOLOGY=&d-5564009-fn_C_LAPUL=&d-5564009-fn_C_GAUL=&d-5564009-fn_C_PENDING_REASON=&d-5564009-fn_C_KODE_PRODUK=&d-5564009-fn_DATEMODIFIED=&d-5564009-fn_C_CLOSED_BY=&d-5564009-fn_C_WORK_ZONE=&d-5564009-fn_C_WITEL='.$witel.'&d-5564009-fn_C_SYMPTOM=&d-5564009-fn_C_REGION=&d-5564009-fn_C_ID_TICKET=&d-5564009-fn_C_SOLUTION_DESCRIPTION=&d-5564009-fn_C_DESCRIPTION_ACTUALSOLUTION=&d-5564009-fn_C_ACTUAL_SOLUTION=&d-5564009-fn_C_CLASSIFICATION_PATH=&d-5564009-fn_C_INCIDENT_DOMAIN=&d-5564009-fn_C_TICKET_STATUS=&d-5564009-fn_C_REPORTED_BY=&d-5564009-fn_C_PERANGKAT=&d-5564009-fn_C_TECHNICIAN=&d-5564009-fn_C_HIERARCHY_PATH=&d-5564009-fn_C_DESCRIPTION_ASSIGMENT=&d-5564009-fn_C_CLASSIFICATION_CATEGORY=&d-5564009-fn_C_REALM=&d-5564009-fn_C_PIPE_NAME=&d-5564009-fn_C_RELATED_TO_GAMAS=&OWASP_CSRFTOKEN='.$tokenValue,
+            CURLOPT_URL => 'https://oss-incident.telkom.co.id/jw/web/userview/ticketIncidentService/ticketIncidentService/_/allTicketList?d-5564009-p='.$page.'&d-5564009-ps='.$page_show.'&d-5564009-fn_reported_date_filter='.urlencode($start_datetime).'&d-5564009-fn_reported_date_filter='.urlencode($end_datetime).'&d-5564009-fn_C_CONTACT_NAME=&d-5564009-fn_status_date_filter=&d-5564009-fn_status_date_filter=&d-5564009-fn_C_CONTACT_PHONE=&d-5564009-fn_C_SUMMARY=&d-5564009-fn_C_CONTACT_EMAIL=&d-5564009-fn_C_OWNER_GROUP=&d-5564009-fn_C_OWNER=&d-5564009-fn_C_REPORTED_PRIORITY=&d-5564009-fn_C_SOURCE_TICKET=GAMAS,PROACTIVE,CUSTOMER&d-5564009-fn_C_SUBSIDIARY=&d-5564009-fn_C_EXTERNAL_TICKETID=&d-5564009-fn_C_CHANNEL=&d-5564009-fn_C_CUSTOMER_SEGMENT=DCS,PL-TSEL&d-5564009-fn_C_CUSTOMER_TYPE=&d-5564009-fn_C_CUSTOMER_ID=&d-5564009-fn_C_DESCRIPTION_CUSTOMERID=&d-5564009-fn_C_SERVICE_NO=&d-5564009-fn_C_SERVICE_TYPE=&d-5564009-fn_C_SERVICE_ID=&d-5564009-fn_C_SLG=&d-5564009-fn_C_TECHNOLOGY=&d-5564009-fn_C_LAPUL=&d-5564009-fn_C_GAUL=&d-5564009-fn_C_PENDING_REASON=&d-5564009-fn_C_KODE_PRODUK=&d-5564009-fn_DATEMODIFIED=&d-5564009-fn_C_CLOSED_BY=&d-5564009-fn_C_WORK_ZONE=&d-5564009-fn_C_WITEL='.$witel.'&d-5564009-fn_C_SYMPTOM=&d-5564009-fn_C_REGION=&d-5564009-fn_C_ID_TICKET=&d-5564009-fn_C_SOLUTION_DESCRIPTION=&d-5564009-fn_C_DESCRIPTION_ACTUALSOLUTION=&d-5564009-fn_C_ACTUAL_SOLUTION=&d-5564009-fn_C_CLASSIFICATION_PATH=&d-5564009-fn_C_INCIDENT_DOMAIN=&d-5564009-fn_C_TICKET_STATUS=&d-5564009-fn_C_REPORTED_BY=&d-5564009-fn_C_PERANGKAT=&d-5564009-fn_C_TECHNICIAN=&d-5564009-fn_C_HIERARCHY_PATH=&d-5564009-fn_C_DESCRIPTION_ASSIGMENT=&d-5564009-fn_C_CLASSIFICATION_CATEGORY=&d-5564009-fn_C_REALM=&d-5564009-fn_C_PIPE_NAME=&d-5564009-fn_C_RELATED_TO_GAMAS=&d-5564009-fn_C_TICKET_ID_GAMAS=&d-5564009-fn_C_GUARANTE_STATUS=&OWASP_CSRFTOKEN='.$tokenValue,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -277,7 +281,8 @@ class InseraController extends Controller
         $dom->loadHTML(trim($response));
         $table = $dom->getElementsByTagName('table')->item(0);
         $rows = $table->getElementsByTagName('tr');
-        $columns = array( 1 =>
+        $columns = [1 =>
+            'parent_id',
             'incident',
             'ttr_customer',
             'summary',
@@ -341,12 +346,13 @@ class InseraController extends Controller
             'ttr_end_to_end',
             'notes_eskalasi',
             'guarante_status',
-            'resolved_date'
-        );
-        $result = array();
+            'resolved_date',
+            'address_incident'
+        ];
+        $result = [];
         for ($i = 1, $count = $rows->length; $i < $count; $i++) {
             $cells = $rows->item($i)->getElementsByTagName('td');
-            $data = array();
+            $data = [];
             for ($j = 1, $jcount = count($columns); $j <= $jcount; $j++) {
                 $td = $cells->item($j);
                 $data[$columns[$j]] =  $td->nodeValue;
