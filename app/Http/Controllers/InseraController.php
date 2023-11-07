@@ -197,7 +197,7 @@ class InseraController extends Controller
 
     public static function ticket_list($witel)
     {
-        for ($i = 0; $i <= 6; $i++)
+        for ($i = 0; $i <= 3; $i++)
         {
             $date = date('Y-m-d', strtotime("-$i days"));
 
