@@ -340,7 +340,9 @@ class StarclickOneController extends Controller
                     {
                         $link = 'https://starclickncx.telkom.co.id/newsc/api/public/starclick/api/tracking-naf?_dc=1593610106271&ScNoss=true&guid=0&code=0&data={"SearchText":"'.$witel.'","Field":"ORG","Fieldstatus":null,"Fieldtransaksi":null,"StartDate":"'.$datex.'","EndDate":"'.$datex.'","start":null,"source":"NOSS","typeMenu":"TRACKING"}&&page=1&start='.$start.'&limit=10';
 
-                        exec('php /srv/htdocs/tomman_api/artisan grabstarclickone_insert ' . $witel . ' ' . $datex . ' 1 0 "' . $sc1->cookies . '" > /dev/null &');
+                        self::grabstarclickone_insert($witel, $datex, 1, 0, $sc1->cookies);
+
+                        // exec('php /srv/htdocs/tomman_api/artisan grabstarclickone_insert ' . $witel . ' ' . $datex . ' 1 0 "' . $sc1->cookies . '" > /dev/null &');
 
                         print_r("php /srv/htdocs/tomman_api/artisan grabstarclickone_insert $witel $datex 1 0 $sc1->cookies > /dev/null &\n\n");
                     }
@@ -359,7 +361,9 @@ class StarclickOneController extends Controller
                                 $start = $start + 10;
                             }
 
-                            exec('php /srv/htdocs/tomman_api/artisan grabstarclickone_insert ' . $witel . ' ' . $datex . ' ' . $x . ' ' . $start . ' "' . $sc1->cookies . '" > /dev/null &');
+                            self::grabstarclickone_insert($witel, $datex, $x, $start, $sc1->cookies);
+
+                            // exec('php /srv/htdocs/tomman_api/artisan grabstarclickone_insert ' . $witel . ' ' . $datex . ' ' . $x . ' ' . $start . ' "' . $sc1->cookies . '" > /dev/null &');
 
                             print_r("php /srv/htdocs/tomman_api/artisan grabstarclickone_insert $witel $datex $x $start $sc1->cookies > /dev/null &\n\n");
                         }
