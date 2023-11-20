@@ -14,9 +14,6 @@ class XproController extends Controller
     {
         print_r("$uname $pass $chatid\n\n");
 
-        ini_set('memory_limit', '-1');
-        ini_set('max_execution_time', '-1');
-
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -25,11 +22,11 @@ class XproController extends Controller
             CURLOPT_HEADER         => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_ENCODING       => '',
-            CURLOPT_MAXREDIRS      => 10,
-            CURLOPT_TIMEOUT        => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            // CURLOPT_ENCODING       => '',
+            // CURLOPT_MAXREDIRS      => 10,
+            // CURLOPT_TIMEOUT        => 0,
+            // CURLOPT_FOLLOWLOCATION => true,
+            // CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => 'GET',
         ));
         $response          = curl_exec($curl);
@@ -81,25 +78,25 @@ class XproController extends Controller
         fclose($handle);
         print_r("response $captcha\n\n");
 
-        dd("username=$uname&password=$pass&terms=on&captcha[input]=$captcha&captcha[id]=$captcha_id&redirect_url=&csrf=$csrf_token&meta_csrf_name=&meta_csrf_value=");
+        // dd("username=$uname&password=$pass&terms=on&captcha[input]=$captcha&captcha[id]=$captcha_id&redirect_url=&csrf=$csrf_token&meta_csrf_name=&meta_csrf_value=");
 
         curl_setopt_array($curl, array(
             CURLOPT_URL            => "https://newxpro.telkom.co.id/auth/login",
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER         => true,
+            CURLOPT_HEADER         => false,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_ENCODING       => "",
-            CURLOPT_MAXREDIRS      => 10,
-            CURLOPT_TIMEOUT        => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            // CURLOPT_ENCODING       => "",
+            // CURLOPT_MAXREDIRS      => 10,
+            // CURLOPT_TIMEOUT        => 0,
+            // CURLOPT_FOLLOWLOCATION => true,
+            // CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => "POST",
-            CURLOPT_POSTFIELDS     => "username=$uname&password=$pass&terms=on&captcha[input]=$captcha&captcha[id]=$captcha_id&redirect_url=&csrf=$csrf_token&meta_csrf_name=&meta_csrf_value=",
-            CURLOPT_HTTPHEADER     => [
+            CURLOPT_POSTFIELDS     => urlencode("username=$uname&password=$pass&terms=on&captcha[input]=$captcha&captcha[id]=$captcha_id&redirect_url=&csrf=$csrf_token&meta_csrf_name=&meta_csrf_value="),
+            CURLOPT_HTTPHEADER     => array(
                 "Content-Type: application/x-www-form-urlencoded",
                 "Cookie: $cookiesOut"
-            ]
+            )
         ));
         $response = curl_exec($curl);
         curl_close($curl);
