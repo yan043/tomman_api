@@ -201,11 +201,17 @@ class InseraController extends Controller
         {
             $date = date('Y-m-d', strtotime("-$i days"));
 
+            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+
             // self::ticket_list_date($witel, $date);
 
             exec('php /srv/htdocs/tomman_api/artisan ticket_list_date '.$witel.' '.$date.' > /dev/null &');
 
             print_r("php /srv/htdocs/tomman_api/artisan ticket_list_date $witel $date > /dev/null &\n");
+
+            exec('php /srv/htdocs/tomman_api/artisan ticket_list_repo_date '.$witel.' '.$date.' > /dev/null &');
+
+            print_r("php /srv/htdocs/tomman_api/artisan ticket_list_repo_date $witel $date > /dev/null &\n");
 
             sleep(10);
         }
@@ -329,7 +335,6 @@ class InseraController extends Controller
             'kode_produk',
             'perangkat',
             'technician',
-            'device_type',
             'device_name',
             'worklog_summary',
             'classfication_flag',
@@ -412,7 +417,214 @@ class InseraController extends Controller
 
         if ($total > 0)
         {
-            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+            // DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+
+            foreach(array_chunk($result, 500) as $data)
+            {
+                DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
+            }
+
+            print_r("reported date $date assurance order insera witel $witel total $total\n");
+
+            sleep(5);
+        }
+    }
+
+    public static function ticket_list_repo_date($witel, $date)
+    {
+        $start_datetime = date('Y-m-d 00:00:00', strtotime($date));
+        $end_datetime   = date('Y-m-d 23:59:59', strtotime($date));
+
+        $page           = 1;
+        $page_show      = 10000;
+
+        $insera         = DB::table('cookie_systems')->where('application', 'insera')->first();
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://oss-incident.telkom.co.id/jw/web/userview/ticketIncidentService/ticketIncidentService/_/welcome',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Cookie: '.$insera->cookies
+            ),
+        ));
+        $response = curl_exec($curl);
+
+        $pattern = '/JPopup\.tokenValue\s*=\s*["\']([^"\']+)["\']/';
+        if (preg_match($pattern, $response, $matches))
+        {
+            $tokenValue = $matches[1];
+        }
+        else
+        {
+            $tokenValue = null;
+        }
+
+        // print_r("$insera->cookies\n");
+        // print_r("$tokenValue\n\n");
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://oss-incident.telkom.co.id/jw/web/userview/ticketIncidentService/ticketIncidentService/_/allTicketListRepo?d-7228731-p='.$page.'&d-7228731-ps='.$page_show.'&d-7228731-fn_reported_date_filter='.urlencode($start_datetime).'&d-7228731-fn_reported_date_filter='.urlencode($end_datetime).'&d-7228731-fn_status_date_filter=&d-7228731-fn_status_date_filter=&d-7228731-fn_C_OWNER_GROUP=&d-7228731-fn_C_OWNER=&d-7228731-fn_C_REPORTED_PRIORITY=&d-7228731-fn_C_SOURCE_TICKET=GAMAS,PROACTIVE,CUSTOMER&d-7228731-fn_C_EXTERNAL_TICKETID=&d-7228731-fn_C_CHANNEL=&d-7228731-fn_C_CUSTOMER_SEGMENT=DCS,PL-TSEL&d-7228731-fn_C_CUSTOMER_TYPE=&d-7228731-fn_C_SERVICE_NO=&d-7228731-fn_C_SERVICE_TYPE=&d-7228731-fn_C_SERVICE_ID=&d-7228731-fn_C_SLG=&d-7228731-fn_C_KODE_PRODUK=&d-7228731-fn_DATEMODIFIED=&d-7228731-fn_C_CLOSED_BY=&d-7228731-fn_C_WORK_ZONE=&d-7228731-fn_C_WITEL='.$witel.'&d-7228731-fn_C_REGION=&d-7228731-fn_C_ID_TICKET=&d-7228731-fn_C_ACTUAL_SOLUTION=&d-7228731-fn_C_CLASSIFICATION_PATH=&d-7228731-fn_C_INCIDENT_DOMAIN=&d-7228731-fn_C_PERANGKAT=&d-7228731-fn_C_DESCRIPTION_ASSIGMENT=&d-7228731-fn_C_CLASSIFICATION_CATEGORY=&d-7228731-fn_C_REALM=&d-7228731-fn_C_PIPE_NAME=&d-7228731-fn_C_RELATED_TO_GAMAS=&d-7228731-fn_C_TICKET_ID_GAMAS=&d-7228731-fn_C_GUARANTE_STATUS=&OWASP_CSRFTOKEN='.$tokenValue,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Cookie: '.$insera->cookies
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $dom->loadHTML(trim($response));
+        $table = $dom->getElementsByTagName('table')->item(0);
+        $rows = $table->getElementsByTagName('tr');
+        $columns = [1 =>
+            'parent_id',
+            'incident',
+            'ttr_customer',
+            'summary',
+            'reported_date',
+            'owner_group',
+            'owner',
+            'customer_segment',
+            'service_type',
+            'witel',
+            'workzone',
+            'status',
+            'status_date',
+            'induk_gamas',
+            'reported_by',
+            'contact_phone',
+            'contact_name',
+            'contact_email',
+            'booking_date',
+            'assigned_by',
+            'reported_priority',
+            'source',
+            'subsidiary',
+            'external_ticket_id',
+            'channel',
+            'customer_type',
+            'closed_by',
+            'customer_id',
+            'customer_name',
+            'service_id',
+            'service_no',
+            'slg',
+            'technology',
+            'lapul',
+            'gaul',
+            'onu_rx_pwr',
+            'pending_reason',
+            'last_update_ticket',
+            'incident_domain',
+            'regional',
+            'incidents_symptom',
+            'hierarchy_path',
+            'solutions_segment',
+            'actual_solution',
+            'kode_produk',
+            'perangkat',
+            'technician',
+            'device_name',
+            'worklog_summary',
+            'classfication_flag',
+            'realm',
+            'related_to_gamas',
+            'tsc_result',
+            'scc_result',
+            'ttr_agent',
+            'ttr_mitra',
+            'ttr_nasional',
+            'ttr_pending',
+            'ttr_region',
+            'ttr_witel',
+            'ttr_end_to_end',
+            'notes_eskalasi',
+            'guarante_status',
+            'resolved_date',
+            'address_incident'
+        ];
+        $result = [];
+        for ($i = 1, $count = $rows->length; $i < $count; $i++) {
+            $cells = $rows->item($i)->getElementsByTagName('td');
+            $data = [];
+            for ($j = 1, $jcount = count($columns); $j <= $jcount; $j++) {
+                $td = $cells->item($j);
+                $data[$columns[$j]] =  $td->nodeValue;
+
+                if ($j == 0)
+                {
+                    $data['id_incident'] = substr($td->nodeValue, 2);
+                    $data['incident'] = $td->nodeValue;
+                }
+            }
+            $data['id_incident'] = substr($data['incident'], 3);
+
+            if ($data['status_date'] == '')
+            {
+                $data['status_date'] = '0000-00-00 00:00:00';
+            }
+            else
+            {
+                $data['status_date'] = date('Y-m-d H:i:s', strtotime($data['status_date']));
+            }
+
+            if ($data['booking_date'] == '')
+            {
+                $data['booking_date'] = '0000-00-00 00:00:00';
+            }
+            else
+            {
+                $data['booking_date'] = date('Y-m-d H:i:s', strtotime($data['booking_date']));
+            }
+
+            if ($data['reported_date'] == '')
+            {
+                $data['reported_date'] = '0000-00-00 00:00:00';
+                $data['date_reported'] = '0000-00-00';
+                $data['time_reported'] = '00:00:00';
+            }
+            else
+            {
+                $data['reported_date'] = date('Y-m-d H:i:s', strtotime($data['reported_date']));
+                $data['date_reported'] = date('Y-m-d', strtotime($data['reported_date']));
+                $data['time_reported'] = date('H:i:s', strtotime($data['reported_date']));
+            }
+
+            if ($data['resolved_date'] == '')
+            {
+                $data['resolved_date'] = '0000-00-00 00:00:00';
+            }
+            else
+            {
+                $data['resolved_date'] = date('Y-m-d H:i:s', strtotime($data['resolved_date']));
+            }
+
+            $result[] = $data;
+        }
+
+        $total = count($result);
+
+        if ($total > 0)
+        {
+            // DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
 
             foreach(array_chunk($result, 500) as $data)
             {
