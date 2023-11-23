@@ -201,8 +201,6 @@ class InseraController extends Controller
         {
             $date = date('Y-m-d', strtotime("-$i days"));
 
-            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
-
             // self::ticket_list_date($witel, $date);
 
             exec('php /srv/htdocs/tomman_api/artisan ticket_list_date '.$witel.' '.$date.' > /dev/null &');
@@ -417,7 +415,7 @@ class InseraController extends Controller
 
         if ($total > 0)
         {
-            // DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND status != 'CLOSED' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
 
             foreach(array_chunk($result, 500) as $data)
             {
@@ -624,7 +622,7 @@ class InseraController extends Controller
 
         if ($total > 0)
         {
-            // DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND status = 'CLOSED' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
 
             foreach(array_chunk($result, 500) as $data)
             {
