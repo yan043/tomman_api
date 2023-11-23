@@ -197,35 +197,49 @@ class InseraController extends Controller
 
     public static function ticket_list($witel)
     {
+        $total_all = $total_close = 0;
+
         for ($i = 0; $i <= 3; $i++)
         {
             $date = date('Y-m-d', strtotime("-$i days"));
 
-            // self::ticket_list_date($witel, $date);
+            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
 
-            exec('php /srv/htdocs/tomman_api/artisan ticket_list_date '.$witel.' '.$date.' > /dev/null &');
+            $total_all = self::ticket_list_date('show', $witel, $date);
 
-            print_r("php /srv/htdocs/tomman_api/artisan ticket_list_date $witel $date > /dev/null &\n");
+            $total_close = self::ticket_list_repo_date('show', $witel, $date);
 
-            exec('php /srv/htdocs/tomman_api/artisan ticket_list_repo_date '.$witel.' '.$date.' > /dev/null &');
+            if ($total_all > 0 || $total_close > 0)
+            {
+                self::ticket_list_date('save', $witel, $date);
 
-            print_r("php /srv/htdocs/tomman_api/artisan ticket_list_repo_date $witel $date > /dev/null &\n");
+                // exec('php /srv/htdocs/tomman_api/artisan ticket_list_date save '.$witel.' '.$date.' > /dev/null &');
 
-            sleep(10);
+                // print_r("php /srv/htdocs/tomman_api/artisan ticket_list_date save $witel $date > /dev/null &\n");
+
+                self::ticket_list_repo_date('save', $witel, $date);
+
+                // exec('php /srv/htdocs/tomman_api/artisan ticket_list_repo_date save '.$witel.' '.$date.' > /dev/null &');
+
+                // print_r("php /srv/htdocs/tomman_api/artisan ticket_list_repo_date save $witel $date > /dev/null &\n");
+
+                sleep(10);
+            }
         }
 
-        // ApiController::cleansing_trash_order_kawan($witel);
+        ApiController::cleansing_trash_order_kawan($witel);
 
         exec('php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan '.$witel.' > /dev/null &');
 
         print_r("php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan $witel > /dev/null &\n");
     }
 
-    public static function ticket_list_date($witel, $date)
+    public static function ticket_list_date($type, $witel, $date)
     {
         $start_datetime = date('Y-m-d 00:00:00', strtotime($date));
         $end_datetime   = date('Y-m-d 23:59:59', strtotime($date));
 
+        $total          = 0;
         $page           = 1;
         $page_show      = 10000;
 
@@ -246,7 +260,7 @@ class InseraController extends Controller
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Cookie: '.$insera->cookies
-              ),
+            ),
         ));
         $response = curl_exec($curl);
 
@@ -259,9 +273,6 @@ class InseraController extends Controller
         {
             $tokenValue = null;
         }
-
-        // print_r("$insera->cookies\n");
-        // print_r("$tokenValue\n\n");
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://oss-incident.telkom.co.id/jw/web/userview/ticketIncidentService/ticketIncidentService/_/allTicketList?d-5564009-p='.$page.'&d-5564009-ps='.$page_show.'&d-5564009-fn_reported_date_filter='.urlencode($start_datetime).'&d-5564009-fn_reported_date_filter='.urlencode($end_datetime).'&d-5564009-fn_C_CONTACT_NAME=&d-5564009-fn_status_date_filter=&d-5564009-fn_status_date_filter=&d-5564009-fn_C_CONTACT_PHONE=&d-5564009-fn_C_SUMMARY=&d-5564009-fn_C_CONTACT_EMAIL=&d-5564009-fn_C_OWNER_GROUP=&d-5564009-fn_C_OWNER=&d-5564009-fn_C_REPORTED_PRIORITY=&d-5564009-fn_C_SOURCE_TICKET=GAMAS,PROACTIVE,CUSTOMER&d-5564009-fn_C_SUBSIDIARY=&d-5564009-fn_C_EXTERNAL_TICKETID=&d-5564009-fn_C_CHANNEL=&d-5564009-fn_C_CUSTOMER_SEGMENT=DCS,PL-TSEL&d-5564009-fn_C_CUSTOMER_TYPE=&d-5564009-fn_C_CUSTOMER_ID=&d-5564009-fn_C_DESCRIPTION_CUSTOMERID=&d-5564009-fn_C_SERVICE_NO=&d-5564009-fn_C_SERVICE_TYPE=&d-5564009-fn_C_SERVICE_ID=&d-5564009-fn_C_SLG=&d-5564009-fn_C_TECHNOLOGY=&d-5564009-fn_C_LAPUL=&d-5564009-fn_C_GAUL=&d-5564009-fn_C_PENDING_REASON=&d-5564009-fn_C_KODE_PRODUK=&d-5564009-fn_DATEMODIFIED=&d-5564009-fn_C_CLOSED_BY=&d-5564009-fn_C_WORK_ZONE=&d-5564009-fn_C_WITEL='.$witel.'&d-5564009-fn_C_SYMPTOM=&d-5564009-fn_C_REGION=&d-5564009-fn_C_ID_TICKET=&d-5564009-fn_C_SOLUTION_DESCRIPTION=&d-5564009-fn_C_DESCRIPTION_ACTUALSOLUTION=&d-5564009-fn_C_ACTUAL_SOLUTION=&d-5564009-fn_C_CLASSIFICATION_PATH=&d-5564009-fn_C_INCIDENT_DOMAIN=&d-5564009-fn_C_TICKET_STATUS=&d-5564009-fn_C_REPORTED_BY=&d-5564009-fn_C_PERANGKAT=&d-5564009-fn_C_TECHNICIAN=&d-5564009-fn_C_HIERARCHY_PATH=&d-5564009-fn_C_DESCRIPTION_ASSIGMENT=&d-5564009-fn_C_CLASSIFICATION_CATEGORY=&d-5564009-fn_C_REALM=&d-5564009-fn_C_PIPE_NAME=&d-5564009-fn_C_RELATED_TO_GAMAS=&d-5564009-fn_C_TICKET_ID_GAMAS=&d-5564009-fn_C_GUARANTE_STATUS=&OWASP_CSRFTOKEN='.$tokenValue,
@@ -413,26 +424,33 @@ class InseraController extends Controller
 
         $total = count($result);
 
-        if ($total > 0)
-        {
-            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND status != 'CLOSED' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+        switch ($type) {
+            case 'show':
+                    return $total;
+                break;
 
-            foreach(array_chunk($result, 500) as $data)
-            {
-                DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
-            }
+            case 'save':
+                    if ($total > 0)
+                    {
+                        foreach(array_chunk($result, 500) as $data)
+                        {
+                            DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
+                        }
 
-            print_r("reported date $date assurance order insera witel $witel total $total\n");
+                        print_r("reported date $date assurance order insera status all witel $witel total $total\n");
 
-            sleep(5);
+                        sleep(5);
+                    }
+                break;
         }
     }
 
-    public static function ticket_list_repo_date($witel, $date)
+    public static function ticket_list_repo_date($type, $witel, $date)
     {
         $start_datetime = date('Y-m-d 00:00:00', strtotime($date));
         $end_datetime   = date('Y-m-d 23:59:59', strtotime($date));
 
+        $total          = 0;
         $page           = 1;
         $page_show      = 10000;
 
@@ -466,9 +484,6 @@ class InseraController extends Controller
         {
             $tokenValue = null;
         }
-
-        // print_r("$insera->cookies\n");
-        // print_r("$tokenValue\n\n");
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://oss-incident.telkom.co.id/jw/web/userview/ticketIncidentService/ticketIncidentService/_/allTicketListRepo?d-7228731-p='.$page.'&d-7228731-ps='.$page_show.'&d-7228731-fn_reported_date_filter='.urlencode($start_datetime).'&d-7228731-fn_reported_date_filter='.urlencode($end_datetime).'&d-7228731-fn_status_date_filter=&d-7228731-fn_status_date_filter=&d-7228731-fn_C_OWNER_GROUP=&d-7228731-fn_C_OWNER=&d-7228731-fn_C_REPORTED_PRIORITY=&d-7228731-fn_C_SOURCE_TICKET=GAMAS,PROACTIVE,CUSTOMER&d-7228731-fn_C_EXTERNAL_TICKETID=&d-7228731-fn_C_CHANNEL=&d-7228731-fn_C_CUSTOMER_SEGMENT=DCS,PL-TSEL&d-7228731-fn_C_CUSTOMER_TYPE=&d-7228731-fn_C_SERVICE_NO=&d-7228731-fn_C_SERVICE_TYPE=&d-7228731-fn_C_SERVICE_ID=&d-7228731-fn_C_SLG=&d-7228731-fn_C_KODE_PRODUK=&d-7228731-fn_DATEMODIFIED=&d-7228731-fn_C_CLOSED_BY=&d-7228731-fn_C_WORK_ZONE=&d-7228731-fn_C_WITEL='.$witel.'&d-7228731-fn_C_REGION=&d-7228731-fn_C_ID_TICKET=&d-7228731-fn_C_ACTUAL_SOLUTION=&d-7228731-fn_C_CLASSIFICATION_PATH=&d-7228731-fn_C_INCIDENT_DOMAIN=&d-7228731-fn_C_PERANGKAT=&d-7228731-fn_C_DESCRIPTION_ASSIGMENT=&d-7228731-fn_C_CLASSIFICATION_CATEGORY=&d-7228731-fn_C_REALM=&d-7228731-fn_C_PIPE_NAME=&d-7228731-fn_C_RELATED_TO_GAMAS=&d-7228731-fn_C_TICKET_ID_GAMAS=&d-7228731-fn_C_GUARANTE_STATUS=&OWASP_CSRFTOKEN='.$tokenValue,
@@ -620,18 +635,24 @@ class InseraController extends Controller
 
         $total = count($result);
 
-        if ($total > 0)
-        {
-            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND status = 'CLOSED' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+        switch ($type) {
+            case 'show':
+                    return $total;
+                break;
 
-            foreach(array_chunk($result, 500) as $data)
-            {
-                DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
-            }
+            case 'save':
+                    if ($total > 0)
+                    {
+                        foreach(array_chunk($result, 500) as $data)
+                        {
+                            DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
+                        }
 
-            print_r("reported date $date assurance order insera witel $witel total $total\n");
+                        print_r("reported date $date assurance order insera status closed witel $witel total $total\n");
 
-            sleep(5);
+                        sleep(5);
+                    }
+                break;
         }
     }
 }

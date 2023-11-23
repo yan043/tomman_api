@@ -217,8 +217,11 @@ Artisan::command('refresh_insera', function () {
 Artisan::command('ticket_list {witel}', function ($witel) {
     InseraController::ticket_list($witel);
 });
-Artisan::command('ticket_list_date {witel} {date}', function ($witel, $date) {
-    InseraController::ticket_list_date($witel, $date);
+Artisan::command('ticket_list_date {type} {witel} {date}', function ($type, $witel, $date) {
+    InseraController::ticket_list_date($type, $witel, $date);
+});
+Artisan::command('ticket_list_repo_date {type} {witel} {date}', function ($type, $witel, $date) {
+    InseraController::ticket_list_repo_date($type, $witel, $date);
 });
 
 // risma
