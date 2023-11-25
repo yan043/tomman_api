@@ -360,8 +360,7 @@ class InseraController extends Controller
             'ttr_end_to_end',
             'notes_eskalasi',
             'guarante_status',
-            'resolved_date',
-            'address_incident'
+            'resolved_date'
         ];
         $result = [];
         for ($i = 1, $count = $rows->length; $i < $count; $i++) {
@@ -571,8 +570,7 @@ class InseraController extends Controller
             'ttr_end_to_end',
             'notes_eskalasi',
             'guarante_status',
-            'resolved_date',
-            'address_incident'
+            'resolved_date'
         ];
         $result = [];
         for ($i = 1, $count = $rows->length; $i < $count; $i++) {
