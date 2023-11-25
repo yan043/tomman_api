@@ -203,14 +203,14 @@ class InseraController extends Controller
         {
             $date = date('Y-m-d', strtotime("-$i days"));
 
-            DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
-
             $total_all = self::ticket_list_date('show', $witel, $date);
 
             $total_close = self::ticket_list_repo_date('show', $witel, $date);
 
             if ($total_all > 0 || $total_close > 0)
             {
+                DB::connection('db_data_center')->statement("DELETE FROM assurance_nossa_order WHERE incident LIKE 'INC%' AND witel = '$witel' AND (DATE(date_reported) = '$date')");
+
                 self::ticket_list_date('save', $witel, $date);
 
                 // exec('php /srv/htdocs/tomman_api/artisan ticket_list_date save '.$witel.' '.$date.' > /dev/null &');
