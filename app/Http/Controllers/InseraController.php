@@ -291,156 +291,163 @@ class InseraController extends Controller
         $response = curl_exec($curl);
         curl_close($curl);
 
-        libxml_use_internal_errors(true);
-        $dom = new \DOMDocument();
-        $dom->loadHTML(trim($response));
-        $table = $dom->getElementsByTagName('table')->item(0);
-        $rows = $table->getElementsByTagName('tr');
-        $columns = [1 =>
-            'parent_id',
-            'incident',
-            'ttr_customer',
-            'summary',
-            'reported_date',
-            'owner_group',
-            'owner',
-            'customer_segment',
-            'service_type',
-            'witel',
-            'workzone',
-            'status',
-            'status_date',
-            'induk_gamas',
-            'reported_by',
-            'contact_phone',
-            'contact_name',
-            'contact_email',
-            'booking_date',
-            'assigned_by',
-            'reported_priority',
-            'source',
-            'subsidiary',
-            'external_ticket_id',
-            'channel',
-            'customer_type',
-            'closed_by',
-            'customer_id',
-            'customer_name',
-            'service_id',
-            'service_no',
-            'slg',
-            'technology',
-            'lapul',
-            'gaul',
-            'onu_rx_pwr',
-            'pending_reason',
-            'last_update_ticket',
-            'incident_domain',
-            'regional',
-            'incidents_symptom',
-            'hierarchy_path',
-            'solutions_segment',
-            'actual_solution',
-            'kode_produk',
-            'perangkat',
-            'technician',
-            'device_name',
-            'worklog_summary',
-            'classfication_flag',
-            'realm',
-            'related_to_gamas',
-            'tsc_result',
-            'scc_result',
-            'ttr_agent',
-            'ttr_mitra',
-            'ttr_nasional',
-            'ttr_pending',
-            'ttr_region',
-            'ttr_witel',
-            'ttr_end_to_end',
-            'notes_eskalasi',
-            'guarante_status',
-            'resolved_date'
-        ];
-        $result = [];
-        for ($i = 1, $count = $rows->length; $i < $count; $i++) {
-            $cells = $rows->item($i)->getElementsByTagName('td');
-            $data = [];
-            for ($j = 1, $jcount = count($columns); $j <= $jcount; $j++) {
-                $td = $cells->item($j);
-                $data[$columns[$j]] =  $td->nodeValue;
-
-                if ($j == 0)
-                {
-                    $data['id_incident'] = substr($td->nodeValue, 2);
-                    $data['incident'] = $td->nodeValue;
-                }
-            }
-            $data['id_incident'] = substr($data['incident'], 3);
-
-            if ($data['status_date'] == '')
-            {
-                $data['status_date'] = '0000-00-00 00:00:00';
-            }
-            else
-            {
-                $data['status_date'] = date('Y-m-d H:i:s', strtotime($data['status_date']));
-            }
-
-            if ($data['booking_date'] == '')
-            {
-                $data['booking_date'] = '0000-00-00 00:00:00';
-            }
-            else
-            {
-                $data['booking_date'] = date('Y-m-d H:i:s', strtotime($data['booking_date']));
-            }
-
-            if ($data['reported_date'] == '')
-            {
-                $data['reported_date'] = '0000-00-00 00:00:00';
-                $data['date_reported'] = '0000-00-00';
-                $data['time_reported'] = '00:00:00';
-            }
-            else
-            {
-                $data['reported_date'] = date('Y-m-d H:i:s', strtotime($data['reported_date']));
-                $data['date_reported'] = date('Y-m-d', strtotime($data['reported_date']));
-                $data['time_reported'] = date('H:i:s', strtotime($data['reported_date']));
-            }
-
-            if ($data['resolved_date'] == '')
-            {
-                $data['resolved_date'] = '0000-00-00 00:00:00';
-            }
-            else
-            {
-                $data['resolved_date'] = date('Y-m-d H:i:s', strtotime($data['resolved_date']));
-            }
-
-            $result[] = $data;
+        if(preg_match('/Nothing found to display./', $response))
+        {
+            return $total;
         }
+        else
+        {
+            libxml_use_internal_errors(true);
+            $dom = new \DOMDocument();
+            $dom->loadHTML(trim($response));
+            $table = $dom->getElementsByTagName('table')->item(0);
+            $rows = $table->getElementsByTagName('tr');
+            $columns = [1 =>
+                'parent_id',
+                'incident',
+                'ttr_customer',
+                'summary',
+                'reported_date',
+                'owner_group',
+                'owner',
+                'customer_segment',
+                'service_type',
+                'witel',
+                'workzone',
+                'status',
+                'status_date',
+                'induk_gamas',
+                'reported_by',
+                'contact_phone',
+                'contact_name',
+                'contact_email',
+                'booking_date',
+                'assigned_by',
+                'reported_priority',
+                'source',
+                'subsidiary',
+                'external_ticket_id',
+                'channel',
+                'customer_type',
+                'closed_by',
+                'customer_id',
+                'customer_name',
+                'service_id',
+                'service_no',
+                'slg',
+                'technology',
+                'lapul',
+                'gaul',
+                'onu_rx_pwr',
+                'pending_reason',
+                'last_update_ticket',
+                'incident_domain',
+                'regional',
+                'incidents_symptom',
+                'hierarchy_path',
+                'solutions_segment',
+                'actual_solution',
+                'kode_produk',
+                'perangkat',
+                'technician',
+                'device_name',
+                'worklog_summary',
+                'classfication_flag',
+                'realm',
+                'related_to_gamas',
+                'tsc_result',
+                'scc_result',
+                'ttr_agent',
+                'ttr_mitra',
+                'ttr_nasional',
+                'ttr_pending',
+                'ttr_region',
+                'ttr_witel',
+                'ttr_end_to_end',
+                'notes_eskalasi',
+                'guarante_status',
+                'resolved_date'
+            ];
+            $result = [];
+            for ($i = 1, $count = $rows->length; $i < $count; $i++) {
+                $cells = $rows->item($i)->getElementsByTagName('td');
+                $data = [];
+                for ($j = 1, $jcount = count($columns); $j <= $jcount; $j++) {
+                    $td = $cells->item($j);
+                    $data[$columns[$j]] =  $td->nodeValue;
 
-        $total = count($result);
-
-        switch ($type) {
-            case 'show':
-                    return $total;
-                break;
-
-            case 'save':
-                    if ($total > 0)
+                    if ($j == 0)
                     {
-                        foreach(array_chunk($result, 500) as $data)
-                        {
-                            DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
-                        }
-
-                        print_r("reported date $date assurance order insera status all witel $witel total $total\n");
-
-                        sleep(5);
+                        $data['id_incident'] = substr($td->nodeValue, 2);
+                        $data['incident'] = $td->nodeValue;
                     }
-                break;
+                }
+                $data['id_incident'] = substr($data['incident'], 3);
+
+                if ($data['status_date'] == '')
+                {
+                    $data['status_date'] = '0000-00-00 00:00:00';
+                }
+                else
+                {
+                    $data['status_date'] = date('Y-m-d H:i:s', strtotime($data['status_date']));
+                }
+
+                if ($data['booking_date'] == '')
+                {
+                    $data['booking_date'] = '0000-00-00 00:00:00';
+                }
+                else
+                {
+                    $data['booking_date'] = date('Y-m-d H:i:s', strtotime($data['booking_date']));
+                }
+
+                if ($data['reported_date'] == '')
+                {
+                    $data['reported_date'] = '0000-00-00 00:00:00';
+                    $data['date_reported'] = '0000-00-00';
+                    $data['time_reported'] = '00:00:00';
+                }
+                else
+                {
+                    $data['reported_date'] = date('Y-m-d H:i:s', strtotime($data['reported_date']));
+                    $data['date_reported'] = date('Y-m-d', strtotime($data['reported_date']));
+                    $data['time_reported'] = date('H:i:s', strtotime($data['reported_date']));
+                }
+
+                if ($data['resolved_date'] == '')
+                {
+                    $data['resolved_date'] = '0000-00-00 00:00:00';
+                }
+                else
+                {
+                    $data['resolved_date'] = date('Y-m-d H:i:s', strtotime($data['resolved_date']));
+                }
+
+                $result[] = $data;
+            }
+
+            $total = count($result);
+
+            switch ($type) {
+                case 'show':
+                        return $total;
+                    break;
+
+                case 'save':
+                        if ($total > 0)
+                        {
+                            foreach(array_chunk($result, 500) as $data)
+                            {
+                                DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
+                            }
+
+                            print_r("reported date $date assurance order insera status all witel $witel total $total\n");
+
+                            sleep(5);
+                        }
+                    break;
+            }
         }
     }
 
@@ -501,156 +508,163 @@ class InseraController extends Controller
         $response = curl_exec($curl);
         curl_close($curl);
 
-        libxml_use_internal_errors(true);
-        $dom = new \DOMDocument();
-        $dom->loadHTML(trim($response));
-        $table = $dom->getElementsByTagName('table')->item(0);
-        $rows = $table->getElementsByTagName('tr');
-        $columns = [1 =>
-            'parent_id',
-            'incident',
-            'ttr_customer',
-            'summary',
-            'reported_date',
-            'owner_group',
-            'owner',
-            'customer_segment',
-            'service_type',
-            'witel',
-            'workzone',
-            'status',
-            'status_date',
-            'induk_gamas',
-            'reported_by',
-            'contact_phone',
-            'contact_name',
-            'contact_email',
-            'booking_date',
-            'assigned_by',
-            'reported_priority',
-            'source',
-            'subsidiary',
-            'external_ticket_id',
-            'channel',
-            'customer_type',
-            'closed_by',
-            'customer_id',
-            'customer_name',
-            'service_id',
-            'service_no',
-            'slg',
-            'technology',
-            'lapul',
-            'gaul',
-            'onu_rx_pwr',
-            'pending_reason',
-            'last_update_ticket',
-            'incident_domain',
-            'regional',
-            'incidents_symptom',
-            'hierarchy_path',
-            'solutions_segment',
-            'actual_solution',
-            'kode_produk',
-            'perangkat',
-            'technician',
-            'device_name',
-            'worklog_summary',
-            'classfication_flag',
-            'realm',
-            'related_to_gamas',
-            'tsc_result',
-            'scc_result',
-            'ttr_agent',
-            'ttr_mitra',
-            'ttr_nasional',
-            'ttr_pending',
-            'ttr_region',
-            'ttr_witel',
-            'ttr_end_to_end',
-            'notes_eskalasi',
-            'guarante_status',
-            'resolved_date'
-        ];
-        $result = [];
-        for ($i = 1, $count = $rows->length; $i < $count; $i++) {
-            $cells = $rows->item($i)->getElementsByTagName('td');
-            $data = [];
-            for ($j = 1, $jcount = count($columns); $j <= $jcount; $j++) {
-                $td = $cells->item($j);
-                $data[$columns[$j]] =  $td->nodeValue;
-
-                if ($j == 0)
-                {
-                    $data['id_incident'] = substr($td->nodeValue, 2);
-                    $data['incident'] = $td->nodeValue;
-                }
-            }
-            $data['id_incident'] = substr($data['incident'], 3);
-
-            if ($data['status_date'] == '')
-            {
-                $data['status_date'] = '0000-00-00 00:00:00';
-            }
-            else
-            {
-                $data['status_date'] = date('Y-m-d H:i:s', strtotime($data['status_date']));
-            }
-
-            if ($data['booking_date'] == '')
-            {
-                $data['booking_date'] = '0000-00-00 00:00:00';
-            }
-            else
-            {
-                $data['booking_date'] = date('Y-m-d H:i:s', strtotime($data['booking_date']));
-            }
-
-            if ($data['reported_date'] == '')
-            {
-                $data['reported_date'] = '0000-00-00 00:00:00';
-                $data['date_reported'] = '0000-00-00';
-                $data['time_reported'] = '00:00:00';
-            }
-            else
-            {
-                $data['reported_date'] = date('Y-m-d H:i:s', strtotime($data['reported_date']));
-                $data['date_reported'] = date('Y-m-d', strtotime($data['reported_date']));
-                $data['time_reported'] = date('H:i:s', strtotime($data['reported_date']));
-            }
-
-            if ($data['resolved_date'] == '')
-            {
-                $data['resolved_date'] = '0000-00-00 00:00:00';
-            }
-            else
-            {
-                $data['resolved_date'] = date('Y-m-d H:i:s', strtotime($data['resolved_date']));
-            }
-
-            $result[] = $data;
+        if(preg_match('/Nothing found to display./', $response))
+        {
+            return $total;
         }
+        else
+        {
+            libxml_use_internal_errors(true);
+            $dom = new \DOMDocument();
+            $dom->loadHTML(trim($response));
+            $table = $dom->getElementsByTagName('table')->item(0);
+            $rows = $table->getElementsByTagName('tr');
+            $columns = [1 =>
+                'parent_id',
+                'incident',
+                'ttr_customer',
+                'summary',
+                'reported_date',
+                'owner_group',
+                'owner',
+                'customer_segment',
+                'service_type',
+                'witel',
+                'workzone',
+                'status',
+                'status_date',
+                'induk_gamas',
+                'reported_by',
+                'contact_phone',
+                'contact_name',
+                'contact_email',
+                'booking_date',
+                'assigned_by',
+                'reported_priority',
+                'source',
+                'subsidiary',
+                'external_ticket_id',
+                'channel',
+                'customer_type',
+                'closed_by',
+                'customer_id',
+                'customer_name',
+                'service_id',
+                'service_no',
+                'slg',
+                'technology',
+                'lapul',
+                'gaul',
+                'onu_rx_pwr',
+                'pending_reason',
+                'last_update_ticket',
+                'incident_domain',
+                'regional',
+                'incidents_symptom',
+                'hierarchy_path',
+                'solutions_segment',
+                'actual_solution',
+                'kode_produk',
+                'perangkat',
+                'technician',
+                'device_name',
+                'worklog_summary',
+                'classfication_flag',
+                'realm',
+                'related_to_gamas',
+                'tsc_result',
+                'scc_result',
+                'ttr_agent',
+                'ttr_mitra',
+                'ttr_nasional',
+                'ttr_pending',
+                'ttr_region',
+                'ttr_witel',
+                'ttr_end_to_end',
+                'notes_eskalasi',
+                'guarante_status',
+                'resolved_date'
+            ];
+            $result = [];
+            for ($i = 1, $count = $rows->length; $i < $count; $i++) {
+                $cells = $rows->item($i)->getElementsByTagName('td');
+                $data = [];
+                for ($j = 1, $jcount = count($columns); $j <= $jcount; $j++) {
+                    $td = $cells->item($j);
+                    $data[$columns[$j]] =  $td->nodeValue;
 
-        $total = count($result);
-
-        switch ($type) {
-            case 'show':
-                    return $total;
-                break;
-
-            case 'save':
-                    if ($total > 0)
+                    if ($j == 0)
                     {
-                        foreach(array_chunk($result, 500) as $data)
-                        {
-                            DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
-                        }
-
-                        print_r("reported date $date assurance order insera status closed witel $witel total $total\n");
-
-                        sleep(5);
+                        $data['id_incident'] = substr($td->nodeValue, 2);
+                        $data['incident'] = $td->nodeValue;
                     }
-                break;
+                }
+                $data['id_incident'] = substr($data['incident'], 3);
+
+                if ($data['status_date'] == '')
+                {
+                    $data['status_date'] = '0000-00-00 00:00:00';
+                }
+                else
+                {
+                    $data['status_date'] = date('Y-m-d H:i:s', strtotime($data['status_date']));
+                }
+
+                if ($data['booking_date'] == '')
+                {
+                    $data['booking_date'] = '0000-00-00 00:00:00';
+                }
+                else
+                {
+                    $data['booking_date'] = date('Y-m-d H:i:s', strtotime($data['booking_date']));
+                }
+
+                if ($data['reported_date'] == '')
+                {
+                    $data['reported_date'] = '0000-00-00 00:00:00';
+                    $data['date_reported'] = '0000-00-00';
+                    $data['time_reported'] = '00:00:00';
+                }
+                else
+                {
+                    $data['reported_date'] = date('Y-m-d H:i:s', strtotime($data['reported_date']));
+                    $data['date_reported'] = date('Y-m-d', strtotime($data['reported_date']));
+                    $data['time_reported'] = date('H:i:s', strtotime($data['reported_date']));
+                }
+
+                if ($data['resolved_date'] == '')
+                {
+                    $data['resolved_date'] = '0000-00-00 00:00:00';
+                }
+                else
+                {
+                    $data['resolved_date'] = date('Y-m-d H:i:s', strtotime($data['resolved_date']));
+                }
+
+                $result[] = $data;
+            }
+
+            $total = count($result);
+
+            switch ($type) {
+                case 'show':
+                        return $total;
+                    break;
+
+                case 'save':
+                        if ($total > 0)
+                        {
+                            foreach(array_chunk($result, 500) as $data)
+                            {
+                                DB::connection('db_data_center')->table('assurance_nossa_order')->insert($data);
+                            }
+
+                            print_r("reported date $date assurance order insera status closed witel $witel total $total\n");
+
+                            sleep(5);
+                        }
+                    break;
+            }
         }
     }
 }
