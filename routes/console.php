@@ -15,6 +15,8 @@ use App\Http\Controllers\UtOnlineController;
 use App\Http\Controllers\PrabacController;
 use App\Http\Controllers\RismaController;
 use App\Http\Controllers\XproController;
+use App\Http\Controllers\KanossController;
+use App\Http\Controllers\MiaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -154,6 +156,14 @@ Artisan::command('grabstarclick_backend {witel}', function ($witel) {
     StarclickController::grabstarclick_backend($witel);
 });
 
+// mia
+Artisan::command('login_mia {uname} {pass} {chatid}', function ($uname, $pass, $chatid) {
+    MiaController::login_mia($uname, $pass, $chatid);
+});
+Artisan::command('refresh_mia', function () {
+    MiaController::refresh_mia();
+});
+
 // prabac
 Artisan::command('login_prabac {username} {password} {chatid}', function ($username, $password, $chatid) {
     PrabacController::login_prabac($username, $password, $chatid);
@@ -227,6 +237,14 @@ Artisan::command('ticket_list_repo_date {type} {witel} {date}', function ($type,
 // risma
 Artisan::command('all_sync_risma', function () {
     RismaController::all_sync_risma();
+});
+
+// kanoss
+Artisan::command('login_kanoss {uname} {passw} {chatid}', function ($uname, $passw, $chatid) {
+    KanossController::login_kanoss($uname, $passw, $chatid);
+});
+Artisan::command('kanoss_intech', function () {
+    KanossController::kanoss_intech();
 });
 
 // api

@@ -1,17 +1,11 @@
 /storage
 /storage/*
-storage
-storage/*
 
 /vendor
 /vendor/*
-vendor
-vendor/*
 
 /node_modules
 /node_modules/*
-node_modules
-node_modules/*
 
 .env
 *.env
@@ -25,4 +19,5 @@ package-lock.json
 sc.jpg
 sc1.jpg
 tacticalpro_captcha.jpg
+mia.jpg
 cookie.jar

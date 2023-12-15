@@ -41,6 +41,8 @@ class UtOnlineController extends Controller
         $header['cookies'] = $cookiesOut;
         $cookiesOut = implode("; ", $matches['cookie']);
 
+        print_r("Cookies UT Online $cookiesOut");
+
         DB::table('cookie_systems')->where('application', 'utonline')->update([
             'cookies' => $cookiesOut
         ]);
@@ -137,7 +139,9 @@ class UtOnlineController extends Controller
         {
             $date = date('Y-m-d', strtotime("-$i days"));
 
-            exec("php /srv/htdocs/tomman_api/artisan full_utonline_date $utonline->cookies $date > /dev/null &");
+            self::full_utonline_date($utonline->cookies, $date);
+
+            // exec("php /srv/htdocs/tomman_api/artisan full_utonline_date $utonline->cookies $date > /dev/null &");
 
             print_r("php /srv/htdocs/tomman_api/artisan full_utonline_date $utonline->cookies $date > /dev/null &\n");
         }
