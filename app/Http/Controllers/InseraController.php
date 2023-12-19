@@ -215,21 +215,15 @@ class InseraController extends Controller
 
                 // exec('php /srv/htdocs/tomman_api/artisan ticket_list_date save '.$witel.' '.$date.' > /dev/null &');
 
-                // print_r("php /srv/htdocs/tomman_api/artisan ticket_list_date save $witel $date > /dev/null &\n");
-
                 self::ticket_list_repo_date('save', $witel, $date);
 
                 // exec('php /srv/htdocs/tomman_api/artisan ticket_list_repo_date save '.$witel.' '.$date.' > /dev/null &');
-
-                // print_r("php /srv/htdocs/tomman_api/artisan ticket_list_repo_date save $witel $date > /dev/null &\n");
 
                 sleep(10);
             }
         }
 
         ApiController::cleansing_trash_order_kawan($witel);
-
-        exec('php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan '.$witel.' > /dev/null &');
 
         print_r("php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan $witel > /dev/null &\n");
     }
@@ -330,6 +324,7 @@ class InseraController extends Controller
                 'channel',
                 'customer_type',
                 'closed_by',
+                'closed_reopen_by',
                 'customer_id',
                 'customer_name',
                 'service_id',
@@ -366,7 +361,10 @@ class InseraController extends Controller
                 'ttr_end_to_end',
                 'notes_eskalasi',
                 'guarante_status',
-                'resolved_date'
+                'resolved_date',
+                'sn_ont',
+                'tipe_ont',
+                'manufacture_ont'
             ];
             $result = [];
             for ($i = 1, $count = $rows->length; $i < $count; $i++) {
@@ -547,6 +545,7 @@ class InseraController extends Controller
                 'channel',
                 'customer_type',
                 'closed_by',
+                'closed_reopen_by',
                 'customer_id',
                 'customer_name',
                 'service_id',
@@ -583,7 +582,10 @@ class InseraController extends Controller
                 'ttr_end_to_end',
                 'notes_eskalasi',
                 'guarante_status',
-                'resolved_date'
+                'resolved_date',
+                'sn_ont',
+                'tipe_ont',
+                'manufacture_ont'
             ];
             $result = [];
             for ($i = 1, $count = $rows->length; $i < $count; $i++) {
