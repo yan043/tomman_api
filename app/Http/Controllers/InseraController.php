@@ -22,34 +22,31 @@ class InseraController extends Controller
             CURLOPT_HEADER => true,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
         ));
         curl_exec($curl);
         $header = curl_getinfo($curl);
-        $url_redirect = $header['redirect_url'];
+        $url_login = $header['url'];
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $url_redirect,
+            CURLOPT_URL => $url_login,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => true,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        curl_exec($curl);
-        $header = curl_getinfo($curl);
-        $url_redirect_to_login = $header['redirect_url'];
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url_redirect_to_login,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER => true,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
         ));
         $response = curl_exec($curl);
-
         $header = curl_getinfo($curl);
         $header_content = substr($response, 0, $header['header_size']);
         trim(str_replace($header_content, '', $response));
@@ -60,16 +57,23 @@ class InseraController extends Controller
         $header['cookies'] = $cookiesOut;
         $cookiesOut = implode("; ", $matches['cookie']);
 
-        if($cookiesOut)
-        {
-            DB::table('cookie_systems')->where('application', 'insera')->update([
-                'username' => $username,
-                'password' => $password,
-                'cookies'  => $cookiesOut
-            ]);
-        }
-
-        print_r("\n$cookiesOut\n\n");
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://oss-incident.telkom.co.id/jw/web/json/plugin/org.joget.plugin.marketplace.OpenIDDirectoryManager/service?login=1',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+              'Cookie: '.$cookiesOut
+            ),
+        ));
+        curl_exec($curl);
 
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -84,6 +88,11 @@ class InseraController extends Controller
             CURLOPT_HEADER => false,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => 'username='.$username.'&password='.$password.'&credentialId=',
             CURLOPT_HTTPHEADER => array(
@@ -121,6 +130,11 @@ class InseraController extends Controller
             CURLOPT_HEADER => true,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => 'otp='.$otp.'&login=Sign+In',
             CURLOPT_HTTPHEADER => array(
@@ -129,7 +143,6 @@ class InseraController extends Controller
             ),
         ));
         $response = curl_exec($curl);
-
         $header = curl_getinfo($curl);
         $header_content = substr($response, 0, $header['header_size']);
         trim(str_replace($header_content, '', $response));
@@ -139,8 +152,6 @@ class InseraController extends Controller
         $header['headers'] = $header_content;
         $header['cookies'] = $cookiesOut;
         $cookiesOut = implode("; ", array_slice($matches['cookie'], 0, 2));
-
-        print_r("$cookiesOut\n\n");
 
         if($cookiesOut)
         {
@@ -204,15 +215,21 @@ class InseraController extends Controller
 
                 // exec('php /srv/htdocs/tomman_api/artisan ticket_list_date save '.$witel.' '.$date.' > /dev/null &');
 
+                // print_r("php /srv/htdocs/tomman_api/artisan ticket_list_date save $witel $date > /dev/null &\n");
+
                 self::ticket_list_repo_date('save', $witel, $date);
 
                 // exec('php /srv/htdocs/tomman_api/artisan ticket_list_repo_date save '.$witel.' '.$date.' > /dev/null &');
+
+                // print_r("php /srv/htdocs/tomman_api/artisan ticket_list_repo_date save $witel $date > /dev/null &\n");
 
                 sleep(10);
             }
         }
 
         ApiController::cleansing_trash_order_kawan($witel);
+
+        exec('php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan '.$witel.' > /dev/null &');
 
         print_r("php /srv/htdocs/tomman_api/artisan cleansing_trash_order_kawan $witel > /dev/null &\n");
     }
@@ -313,7 +330,6 @@ class InseraController extends Controller
                 'channel',
                 'customer_type',
                 'closed_by',
-                'closed_reopen_by',
                 'customer_id',
                 'customer_name',
                 'service_id',
@@ -350,10 +366,7 @@ class InseraController extends Controller
                 'ttr_end_to_end',
                 'notes_eskalasi',
                 'guarante_status',
-                'resolved_date',
-                'sn_ont',
-                'tipe_ont',
-                'manufacture_ont'
+                'resolved_date'
             ];
             $result = [];
             for ($i = 1, $count = $rows->length; $i < $count; $i++) {
@@ -534,7 +547,6 @@ class InseraController extends Controller
                 'channel',
                 'customer_type',
                 'closed_by',
-                'closed_reopen_by',
                 'customer_id',
                 'customer_name',
                 'service_id',
@@ -571,10 +583,7 @@ class InseraController extends Controller
                 'ttr_end_to_end',
                 'notes_eskalasi',
                 'guarante_status',
-                'resolved_date',
-                'sn_ont',
-                'tipe_ont',
-                'manufacture_ont'
+                'resolved_date'
             ];
             $result = [];
             for ($i = 1, $count = $rows->length; $i < $count; $i++) {
