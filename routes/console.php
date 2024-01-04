@@ -17,6 +17,7 @@ use App\Http\Controllers\RismaController;
 use App\Http\Controllers\XproController;
 use App\Http\Controllers\KanossController;
 use App\Http\Controllers\MiaController;
+use App\Http\Controllers\AccessQualityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -163,6 +164,9 @@ Artisan::command('login_mia {uname} {pass} {chatid}', function ($uname, $pass, $
 Artisan::command('refresh_mia', function () {
     MiaController::refresh_mia();
 });
+Artisan::command('load_data_open_mia {treg} {witel}', function ($treg, $witel) {
+    MiaController::load_data_open_mia($treg, $witel);
+});
 
 // prabac
 Artisan::command('login_prabac {username} {password} {chatid}', function ($username, $password, $chatid) {
@@ -250,4 +254,9 @@ Artisan::command('kanoss_intech', function () {
 // api
 Artisan::command('cleansing_trash_order_kawan {witel}', function ($witel) {
     ApiController::cleansing_trash_order_kawan($witel);
+});
+
+// access quality
+Artisan::command('non_warranty {regional} {witel}', function ($regional, $witel) {
+    AccessQualityController::non_warranty($regional, $witel);
 });
